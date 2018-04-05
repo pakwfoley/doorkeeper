@@ -19,6 +19,10 @@ module Doorkeeper
       def initialize(routes, &block)
         @routes = routes
         @mapping = Mapper.new.map(&block)
+
+        if Doorkeeper.configuration.api_only
+          @mapping.skips.push(:applications, :authorized_applications)
+        end
       end
 
       def generate_routes!(options)
@@ -47,7 +51,7 @@ module Doorkeeper
           as: mapping[:as],
           controller: mapping[:controllers]
         ) do
-          routes.get '/native', action: :show, on: :member
+          routes.get '/:code', action: :show, on: :member
           routes.get '/', action: :new, on: :member
         end
       end
